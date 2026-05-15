@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>BEAST CHECK-IN</title>
+
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+<style>
+
+body{
+  background:#000;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  text-align:center;
+  padding-top:120px;
+}
+
+h1{
+  margin-bottom:40px;
+}
+
+button{
+  padding:20px 40px;
+  font-size:24px;
+  border:none;
+  border-radius:999px;
+  background:#fff;
+  color:#000;
+  font-weight:bold;
+}
+
+#status{
+  margin-top:24px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>BEAST CHECK-IN</h1>
+
+<button onclick="checkIn()">
+CHECK-IN
+</button>
+
+<p id="status">Loading...</p>
+
+<script>
+
+const LIFF_ID = "2010098806-OYFyyTQp";
+
+const GAS_URL =
+"https://script.google.com/macros/s/AKfycbxLnd_ViToNbyAVAmAuZH8Xmchru_KFQhla9U3mqBGR7qzUMb3nDnwKtpc5mg1PHwq-Fw/exec";
+
+async function main(){
+
+  try{
+
+    await liff.init({
+      liffId: LIFF_ID
+    });
+
+    if(!liff.isLoggedIn()){
+
+      document.getElementById("status").innerText =
+        "LOGIN REQUIRED";
+
+      return;
+    }
+
+    document.getElementById("status").innerText =
+      "Ready";
+
+  }catch(e){
+
+    document.getElementById("status").innerText =
+      e.message;
+  }
+}
+
+async function checkIn(){
+
+  const status =
+    document.getElementById("status");
+
+  status.innerText = "Checking in...";
+
+  try{
+
+    if(!liff.isLoggedIn()){
+
+      liff.login();
+      return;
+    }
+
+    const profile =
+      await liff.getProfile();
+
+    await fetch(GAS_URL,{
+
+      method:"POST",
+
+      headers:{
+        "Content-Type":"application/json"
+      },
+
+      body:JSON.stringify({
+
+        userId:profile.userId,
+        displayName:profile.displayName,
+        checkInDate:new Date().toISOString()
+
+      })
+    });
+
+    status.innerText =
+      "CHECK-IN COMPLETE";
+
+    alert(
+      "CHECK-IN COMPLETE : " +
+      profile.displayName
+    );
+
+  }catch(e){
+
+    status.innerText =
+      e.message;
+
+    alert(e.message);
+  }
+}
+
+main();
+
+</script>
+
+</body>
+</html>
