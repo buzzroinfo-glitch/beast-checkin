@@ -1,3 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8">
+
+<title>
+BEAST CHECK-IN
+</title>
+
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+
+  background:#000;
+  color:#fff;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  width:100%;
+  min-height:100vh;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  overflow:hidden;
+}
+
+.container{
+
+  width:100%;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+
+  text-align:center;
+
+  padding:40px;
+}
+
+#mainView{
+
+  width:100%;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.logo{
+
+  font-size:72px;
+  font-weight:900;
+
+  letter-spacing:12px;
+
+  margin-bottom:12px;
+}
+
+.subLogo{
+
+  font-size:24px;
+
+  letter-spacing:12px;
+
+  color:#00ff88;
+
+  margin-bottom:90px;
+
+  text-shadow:
+    0 0 12px rgba(0,255,136,0.5);
+}
+
+button{
+
+  width:320px;
+  height:88px;
+
+  border:none;
+
+  border-radius:4px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #2c2c2c 0%,
+      #050505 100%
+    );
+
+  color:#fff;
+
+  font-size:26px;
+  font-weight:700;
+
+  letter-spacing:6px;
+
+  cursor:pointer;
+
+  transition:0.2s ease;
+
+  border-top:
+    1px solid rgba(255,255,255,0.2);
+
+  border-left:
+    1px solid rgba(255,255,255,0.08);
+
+  border-right:
+    1px solid rgba(0,0,0,0.9);
+
+  border-bottom:
+    4px solid rgba(0,0,0,0.95);
+
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.8),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+button:hover{
+
+  transform:
+    translateY(-2px);
+
+  background:
+    linear-gradient(
+      180deg,
+      #3a3a3a 0%,
+      #111 100%
+    );
+}
+
+button:active{
+
+  transform:
+    translateY(3px);
+
+  border-bottom:
+    1px solid rgba(0,0,0,0.95);
+
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.7);
+}
+
+#status{
+
+  margin-top:28px;
+
+  color:#666;
+
+  font-size:18px;
+
+  letter-spacing:4px;
+}
+
+.successBox{
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  animation:
+    fadeIn 0.5s ease;
+}
+
 .profileImage{
 
   width:160px;
@@ -32,9 +209,9 @@
 
   font-weight:900;
 
-  text-align:center;
-
   line-height:1.2;
+
+  text-align:center;
 }
 
 .welcome{
@@ -47,3 +224,196 @@
 
   text-align:center;
 }
+
+@keyframes fadeIn{
+
+  from{
+    opacity:0;
+    transform:translateY(20px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div id="mainView">
+
+    <div class="logo">
+      BEAST TOKYO
+    </div>
+
+    <div class="subLogo">
+      CHECK-IN SYSTEM
+    </div>
+
+    <button onclick="checkIn()">
+      CHECK-IN
+    </button>
+
+    <div id="status">
+      READY
+    </div>
+
+  </div>
+
+  <div
+    id="successView"
+    style="display:none;"
+  >
+  </div>
+
+</div>
+
+<script>
+
+const LIFF_ID =
+"2010098806-OYFyyTQp";
+
+const GAS_URL =
+"https://script.google.com/macros/s/AKfycbxLnd_ViToNbyAVAmAuZH8Xmchru_KFQhla9U3mqBGR7qzUMb3nDnwKtpc5mg1PHwq-Fw/exec";
+
+async function main(){
+
+  const status =
+    document.getElementById("status");
+
+  try{
+
+    status.innerText =
+      "CONNECTING...";
+
+    await liff.init({
+      liffId: LIFF_ID
+    });
+
+    if(!liff.isLoggedIn()){
+
+      status.innerText =
+        "LOGIN...";
+
+      liff.login();
+
+      return;
+    }
+
+    status.innerText =
+      "READY";
+
+  }catch(e){
+
+    status.innerText =
+      "ERROR";
+
+    console.error(e);
+  }
+}
+
+async function checkIn(){
+
+  const status =
+    document.getElementById("status");
+
+  status.innerText =
+    "CHECKING IN...";
+
+  try{
+
+    const profile =
+      await liff.getProfile();
+
+    await fetch(
+      GAS_URL,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+          userId:
+            profile.userId,
+
+          displayName:
+            profile.displayName,
+
+          pictureUrl:
+            profile.pictureUrl,
+
+          checkInDate:
+            new Date().toISOString()
+
+        })
+      }
+    );
+
+    showSuccess(profile);
+
+  }catch(e){
+
+    status.innerText =
+      "ERROR";
+
+    alert(e.message);
+
+    console.error(e);
+  }
+}
+
+function showSuccess(profile){
+
+  document
+    .getElementById("mainView")
+    .style.display =
+      "none";
+
+  const successView =
+    document.getElementById("successView");
+
+  successView.style.display =
+    "block";
+
+  successView.innerHTML = `
+
+    <div class="successBox">
+
+      <img
+        class="profileImage"
+        src="${profile.pictureUrl}"
+      >
+
+      <div class="successText">
+        ACCESS GRANTED
+      </div>
+
+      <div class="userName">
+        ${profile.displayName}様
+      </div>
+
+      <div class="welcome">
+        BEAST TOKYOへ<br>
+        ようこそ！
+      </div>
+
+    </div>
+
+  `;
+}
+
+main();
+
+</script>
+
+</body>
+</html>
