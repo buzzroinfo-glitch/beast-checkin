@@ -1,226 +1,160 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta charset="utf-8">
-
-<title>
-BEAST CHECK-IN
-</title>
+<title>BEAST CHECK-IN</title>
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
 <style>
 
-*{
+html,body{
   margin:0;
   padding:0;
-  box-sizing:border-box;
+  width:100%;
+  height:100%;
+  background:#000;
+  overflow:hidden;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  color:#fff;
 }
 
 body{
-
-  background:#000;
-  color:#fff;
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-  width:100%;
-  min-height:100vh;
-
   display:flex;
   justify-content:center;
   align-items:center;
-
-  overflow:hidden;
 }
 
-.container{
-
+#app{
   width:100%;
-
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-
+  max-width:520px;
   text-align:center;
-
   padding:40px;
+  box-sizing:border-box;
 }
 
-#mainView{
-
-  width:100%;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
+/* ---------- 初期画面 ---------- */
 
 .logo{
-
   font-size:72px;
   font-weight:900;
-
-  letter-spacing:12px;
-
-  margin-bottom:12px;
+  letter-spacing:8px;
+  line-height:1;
 }
 
 .subLogo{
-
-  font-size:24px;
-
-  letter-spacing:12px;
-
+  margin-top:12px;
   color:#00ff88;
-
-  margin-bottom:90px;
-
-  text-shadow:
-    0 0 12px rgba(0,255,136,0.5);
+  font-size:24px;
+  letter-spacing:8px;
+  line-height:1;
 }
 
-button{
+.checkinButton{
+
+  margin-top:64px;
 
   width:320px;
-  height:88px;
+  height:92px;
 
   border:none;
-
-  border-radius:4px;
+  border-radius:8px;
 
   background:
     linear-gradient(
       180deg,
-      #2c2c2c 0%,
-      #050505 100%
+      #2a2a2a 0%,
+      #111 100%
     );
 
   color:#fff;
 
-  font-size:26px;
-  font-weight:700;
-
+  font-size:34px;
+  font-weight:900;
   letter-spacing:6px;
 
-  cursor:pointer;
-
-  transition:0.2s ease;
-
-  border-top:
-    1px solid rgba(255,255,255,0.2);
-
-  border-left:
-    1px solid rgba(255,255,255,0.08);
-
-  border-right:
-    1px solid rgba(0,0,0,0.9);
-
-  border-bottom:
-    4px solid rgba(0,0,0,0.95);
-
   box-shadow:
-    0 12px 30px rgba(0,0,0,0.8),
-    inset 0 1px 0 rgba(255,255,255,0.1);
+    0 10px 30px rgba(0,0,0,.8),
+    inset 0 1px 0 rgba(255,255,255,.15),
+    inset 0 -2px 0 rgba(0,0,0,.8);
+
+  transition:.15s;
 }
 
-button:hover{
+.checkinButton:active{
 
-  transform:
-    translateY(-2px);
-
-  background:
-    linear-gradient(
-      180deg,
-      #3a3a3a 0%,
-      #111 100%
-    );
-}
-
-button:active{
-
-  transform:
-    translateY(3px);
-
-  border-bottom:
-    1px solid rgba(0,0,0,0.95);
+  transform:translateY(2px);
 
   box-shadow:
-    0 4px 12px rgba(0,0,0,0.7);
+    0 4px 12px rgba(0,0,0,.9),
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.9);
 }
 
 #status{
-
   margin-top:28px;
-
-  color:#666;
-
-  font-size:18px;
-
-  letter-spacing:4px;
+  color:#777;
+  font-size:22px;
+  letter-spacing:3px;
 }
 
-.successBox{
+/* ---------- SUCCESS ---------- */
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-
-  animation:
-    fadeIn 0.5s ease;
+.successWrap{
+  animation:fadeIn .35s ease;
 }
 
 .profileImage{
 
-  width:160px;
-  height:160px;
+  width:320px;
+  height:320px;
 
   border-radius:50%;
-
   object-fit:cover;
 
-  border:5px solid #00ff88;
+  border:8px solid #00ff88;
 
   box-shadow:
-    0 0 60px #00ff88;
+    0 0 25px #00ff88,
+    0 0 80px rgba(0,255,136,.8);
 }
 
 .successText{
 
-  margin-top:30px;
+  margin-top:34px;
 
   color:#00ff88;
 
   font-size:28px;
+  letter-spacing:8px;
 
-  letter-spacing:6px;
+  line-height:1;
 }
 
 .userName{
 
-  margin-top:26px;
+  margin-top:32px;
 
-  font-size:64px;
-
+  font-size:68px;
   font-weight:900;
 
-  line-height:1.2;
+  line-height:1.1;
 
   text-align:center;
 }
 
 .welcome{
 
-  margin-top:34px;
+  margin-top:26px;
 
-  font-size:42px;
+  font-size:34px;
 
-  line-height:1.8;
+  line-height:1.5;
 
   text-align:center;
 }
@@ -229,7 +163,7 @@ button:active{
 
   from{
     opacity:0;
-    transform:translateY(20px);
+    transform:translateY(12px);
   }
 
   to{
@@ -239,12 +173,11 @@ button:active{
 }
 
 </style>
-
 </head>
 
 <body>
 
-<div class="container">
+<div id="app">
 
   <div id="mainView">
 
@@ -256,20 +189,18 @@ button:active{
       CHECK-IN SYSTEM
     </div>
 
-    <button onclick="checkIn()">
+    <button
+      class="checkinButton"
+      onclick="checkIn()">
+
       CHECK-IN
+
     </button>
 
     <div id="status">
-      READY
+      LOADING...
     </div>
 
-  </div>
-
-  <div
-    id="successView"
-    style="display:none;"
-  >
   </div>
 
 </div>
@@ -290,7 +221,7 @@ async function main(){
   try{
 
     status.innerText =
-      "CONNECTING...";
+      "LIFF INIT...";
 
     await liff.init({
       liffId: LIFF_ID
@@ -315,6 +246,8 @@ async function main(){
       "ERROR";
 
     console.error(e);
+
+    alert(e.message);
   }
 }
 
@@ -323,71 +256,63 @@ async function checkIn(){
   const status =
     document.getElementById("status");
 
-  status.innerText =
-    "CHECKING IN...";
-
   try{
+
+    status.innerText =
+      "CHECKING IN...";
 
     const profile =
       await liff.getProfile();
 
-    await fetch(
-      GAS_URL,
-      {
-        method:"POST",
+    await fetch(GAS_URL,{
 
-        body:JSON.stringify({
+      method:"POST",
 
-          userId:
-            profile.userId,
+      headers:{
+        "Content-Type":"application/json"
+      },
 
-          displayName:
-            profile.displayName,
+      body:JSON.stringify({
 
-          pictureUrl:
-            profile.pictureUrl,
+        userId:profile.userId,
+        displayName:profile.displayName,
+        pictureUrl:profile.pictureUrl,
+        checkInDate:new Date().toISOString()
 
-          checkInDate:
-            new Date().toISOString()
-
-        })
-      }
-    );
+      })
+    });
 
     showSuccess(profile);
 
+    setTimeout(()=>{
+
+      liff.closeWindow();
+
+    },3000);
+
   }catch(e){
+
+    console.error(e);
 
     status.innerText =
       "ERROR";
 
     alert(e.message);
-
-    console.error(e);
   }
 }
 
 function showSuccess(profile){
 
-  document
-    .getElementById("mainView")
-    .style.display =
-      "none";
+  const app =
+    document.getElementById("app");
 
-  const successView =
-    document.getElementById("successView");
+  app.innerHTML = `
 
-  successView.style.display =
-    "block";
-
-  successView.innerHTML = `
-
-    <div class="successBox">
+    <div class="successWrap">
 
       <img
         class="profileImage"
-        src="${profile.pictureUrl}"
-      >
+        src="${profile.pictureUrl}">
 
       <div class="successText">
         ACCESS GRANTED
@@ -403,7 +328,6 @@ function showSuccess(profile){
       </div>
 
     </div>
-
   `;
 }
 
