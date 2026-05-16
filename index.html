@@ -32,6 +32,7 @@ button{
 
 #status{
   margin-top:24px;
+  font-size:18px;
 }
 
 </style>
@@ -45,7 +46,9 @@ button{
 CHECK-IN
 </button>
 
-<p id="status">Loading...</p>
+<p id="status">
+Loading...
+</p>
 
 <script>
 
@@ -56,27 +59,40 @@ const GAS_URL =
 
 async function main(){
 
+  const status =
+    document.getElementById("status");
+
   try{
 
+    status.innerText =
+      "LIFF INIT...";
+
     await liff.init({
-      liffId: "2010098806-OYFyyTQp"
+      liffId: LIFF_ID
     });
+
+    status.innerText =
+      "LIFF OK";
 
     if(!liff.isLoggedIn()){
 
-      document.getElementById("status").innerText =
-        "LOGIN REQUIRED";
+      status.innerText =
+        "LOGIN...";
+
+      liff.login();
 
       return;
     }
 
-    document.getElementById("status").innerText =
-      "Ready";
+    status.innerText =
+      "READY";
 
   }catch(e){
 
-    document.getElementById("status").innerText =
-      e.message;
+    status.innerText =
+      "ERROR: " + e.message;
+
+    console.error(e);
   }
 }
 
@@ -85,27 +101,24 @@ async function checkIn(){
   const status =
     document.getElementById("status");
 
-  status.innerText = "Checking in...";
+  status.innerText =
+    "Checking in...";
 
   try{
 
     if(!liff.isLoggedIn()){
 
       liff.login();
+
       return;
     }
 
     const profile =
       await liff.getProfile();
 
-   await fetch(GAS_URL, {
-  method: "POST",
-  body: JSON.stringify({
-    userId: profile.userId,
-    displayName: profile.displayName,
-    checkInDate: new Date().toISOString()
-  })
-});
+    await fetch(GAS_URL, {
+
+      method:"POST",
 
       body:JSON.stringify({
 
@@ -127,46 +140,15 @@ async function checkIn(){
   }catch(e){
 
     status.innerText =
-      e.message;
+      "ERROR: " + e.message;
 
     alert(e.message);
-  }
-}
-
-async function main(){
-
-  const status =
-    document.getElementById("status");
-
-  try{
-
-    status.innerText = "LIFF INIT...";
-
-    await liff.init({
-      liffId: "2010098806-OYFyyTQp"
-    });
-
-    status.innerText = "LIFF OK";
-
-    if(!liff.isLoggedIn()){
-
-      status.innerText = "LOGIN...";
-
-      liff.login();
-
-      return;
-    }
-
-    status.innerText = "READY";
-
-  }catch(e){
-
-    status.innerText =
-      "ERROR: " + e.message;
 
     console.error(e);
   }
 }
+
+main();
 
 </script>
 
