@@ -9,30 +9,130 @@
 <style>
 
 body{
+  margin:0;
   background:#000;
   color:#fff;
   font-family:Arial,sans-serif;
-  text-align:center;
-  padding-top:120px;
+  overflow:hidden;
 }
 
-h1{
-  margin-bottom:40px;
+.container{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
+
+.logo{
+  font-size:48px;
+  font-weight:900;
+  letter-spacing:4px;
+  margin-bottom:12px;
+}
+
+.sub{
+  font-size:14px;
+  letter-spacing:6px;
+  color:#888;
+  margin-bottom:60px;
 }
 
 button{
-  padding:20px 40px;
-  font-size:24px;
+  width:260px;
+  height:80px;
   border:none;
   border-radius:999px;
   background:#fff;
   color:#000;
+  font-size:28px;
   font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:scale(1.05);
 }
 
 #status{
-  margin-top:24px;
+  margin-top:28px;
   font-size:18px;
+  color:#999;
+  min-height:30px;
+}
+
+#success{
+
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,0.95);
+
+  display:none;
+
+  justify-content:center;
+  align-items:center;
+
+  flex-direction:column;
+
+  z-index:999;
+}
+
+.successText1{
+
+  color:#00ff66;
+  font-size:20px;
+  letter-spacing:4px;
+  margin-bottom:24px;
+
+  animation:fade 1s ease;
+}
+
+.successText2{
+
+  font-size:42px;
+  font-weight:900;
+  margin-bottom:16px;
+
+  animation:fade 1.4s ease;
+}
+
+.successText3{
+
+  font-size:28px;
+  line-height:1.8;
+
+  animation:fade 1.8s ease;
+}
+
+.profileImage{
+
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+
+  margin-bottom:32px;
+
+  border:4px solid #00ff66;
+
+  box-shadow:
+    0 0 30px #00ff66;
+}
+
+@keyframes fade{
+
+  from{
+    opacity:0;
+    transform:translateY(20px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
 }
 
 </style>
@@ -40,19 +140,54 @@ button{
 
 <body>
 
-<h1>BEAST CHECK-IN</h1>
+<div class="container">
 
-<button onclick="checkIn()">
-CHECK-IN
-</button>
+  <div class="logo">
+    BEAST
+  </div>
 
-<p id="status">
-Loading...
-</p>
+  <div class="sub">
+    TOKYO CHECK-IN SYSTEM
+  </div>
+
+  <button onclick="checkIn()">
+    CHECK-IN
+  </button>
+
+  <div id="status">
+    INITIALIZING...
+  </div>
+
+</div>
+
+<div id="success">
+
+  <img
+    id="profileImage"
+    class="profileImage"
+  >
+
+  <div class="successText1">
+    ACCESS GRANTED
+  </div>
+
+  <div
+    class="successText2"
+    id="welcomeName"
+  >
+  </div>
+
+  <div class="successText3">
+    BEAST TOKYOへ<br>
+    ようこそ！
+  </div>
+
+</div>
 
 <script>
 
-const LIFF_ID = "2010098806-OYFyyTQp";
+const LIFF_ID =
+"2010098806-OYFyyTQp";
 
 const GAS_URL =
 "https://script.google.com/macros/s/AKfycbxLnd_ViToNbyAVAmAuZH8Xmchru_KFQhla9U3mqBGR7qzUMb3nDnwKtpc5mg1PHwq-Fw/exec";
@@ -65,19 +200,16 @@ async function main(){
   try{
 
     status.innerText =
-      "LIFF INIT...";
+      "CONNECTING TO LINE...";
 
     await liff.init({
       liffId: LIFF_ID
     });
 
-    status.innerText =
-      "LIFF OK";
-
     if(!liff.isLoggedIn()){
 
       status.innerText =
-        "LOGIN...";
+        "LINE LOGIN REQUIRED";
 
       liff.login();
 
@@ -90,7 +222,7 @@ async function main(){
   }catch(e){
 
     status.innerText =
-      "ERROR: " + e.message;
+      "ERROR : " + e.message;
 
     console.error(e);
   }
@@ -102,45 +234,55 @@ async function checkIn(){
     document.getElementById("status");
 
   status.innerText =
-    "Checking in...";
+    "AUTHENTICATING...";
 
   try{
-
-    if(!liff.isLoggedIn()){
-
-      liff.login();
-
-      return;
-    }
 
     const profile =
       await liff.getProfile();
 
-    await fetch(GAS_URL, {
+    await fetch(
+      GAS_URL,
+      {
+        method:"POST",
 
-      method:"POST",
+        body:JSON.stringify({
 
-      body:JSON.stringify({
+          userId:
+            profile.userId,
 
-        userId:profile.userId,
-        displayName:profile.displayName,
-        checkInDate:new Date().toISOString()
+          displayName:
+            profile.displayName,
 
-      })
-    });
+          checkInDate:
+            new Date().toISOString()
+
+        })
+      }
+    );
 
     status.innerText =
       "CHECK-IN COMPLETE";
 
-    alert(
-      "CHECK-IN COMPLETE : " +
-      profile.displayName
-    );
+    document
+      .getElementById("profileImage")
+      .src =
+        profile.pictureUrl;
+
+    document
+      .getElementById("welcomeName")
+      .innerHTML =
+        profile.displayName + "様";
+
+    document
+      .getElementById("success")
+      .style.display =
+        "flex";
 
   }catch(e){
 
     status.innerText =
-      "ERROR: " + e.message;
+      "ERROR";
 
     alert(e.message);
 
