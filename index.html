@@ -8,210 +8,171 @@
 
 <style>
 
-body{
+*{
   margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
   background:#000;
   color:#fff;
   font-family:Arial,sans-serif;
+
+  width:100%;
+  min-height:100vh;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
   overflow:hidden;
 }
 
 .container{
-
-  height:100vh;
+  width:100%;
+  padding:40px;
 
   display:flex;
   flex-direction:column;
-
-  justify-content:center;
   align-items:center;
-
-  text-align:center;
 }
 
 .logo{
-
-  font-size:54px;
+  font-size:72px;
   font-weight:900;
-
   letter-spacing:8px;
 
-  margin-bottom:12px;
+  margin-bottom:8px;
 }
 
-.sub{
+.subLogo{
+  font-size:18px;
+  letter-spacing:10px;
 
-  color:#00ff66;
-
-  letter-spacing:8px;
-
-  font-size:14px;
+  color:#00ff88;
 
   margin-bottom:80px;
-
-  text-shadow:
-    0 0 10px #00ff66;
 }
 
 button{
 
-  width:260px;
+  width:280px;
   height:82px;
 
-  border:none;
-  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.15);
 
-  background:#fff;
-  color:#000;
+  border-radius:10px;
 
-  font-size:28px;
-  font-weight:bold;
+  background:
+    linear-gradient(
+      180deg,
+      #1a1a1a 0%,
+      #050505 100%
+    );
+
+  color:#fff;
+
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:4px;
 
   cursor:pointer;
 
-  animation:pulse 2s infinite;
+  transition:0.25s;
 
-  transition:0.3s;
+  box-shadow:
+    0 0 20px rgba(255,255,255,0.05),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
 }
 
 button:hover{
 
-  transform:scale(1.05);
+  transform:translateY(-2px);
+
+  background:
+    linear-gradient(
+      180deg,
+      #222 0%,
+      #000 100%
+    );
+
+  box-shadow:
+    0 0 30px rgba(255,255,255,0.12);
+}
+
+button:active{
+  transform:scale(0.98);
 }
 
 #status{
-
-  margin-top:28px;
+  margin-top:26px;
 
   color:#777;
 
+  font-size:18px;
   letter-spacing:3px;
-
-  font-size:15px;
 }
 
-#success{
+.successBox{
 
-  position:fixed;
-  inset:0;
-
-  background:#000;
-
-  display:none;
-
-  justify-content:center;
+  display:flex;
+  flex-direction:column;
   align-items:center;
 
-  flex-direction:column;
-
-  text-align:center;
-
-  z-index:999;
+  animation:fadeIn 0.5s ease;
 }
 
 .profileImage{
 
-  width:140px;
-  height:140px;
+  width:120px;
+  height:120px;
 
   border-radius:50%;
 
   object-fit:cover;
 
-  border:4px solid #00ff66;
+  border:4px solid #00ff88;
 
   box-shadow:
-    0 0 30px #00ff66,
-    0 0 60px #00ff66;
-
-  margin-bottom:36px;
-
-  animation:fadeUp 1s ease;
+    0 0 40px #00ff88;
 }
 
-.access{
+.successText{
 
-  color:#00ff66;
+  margin-top:24px;
 
-  font-size:24px;
-  font-weight:900;
+  color:#00ff88;
 
-  letter-spacing:6px;
-
-  margin-bottom:24px;
-
-  text-shadow:
-    0 0 12px #00ff66;
-
-  animation:fadeUp 1.2s ease;
+  font-size:20px;
+  letter-spacing:5px;
 }
 
-.name{
+.userName{
 
-  font-size:52px;
+  margin-top:18px;
+
+  font-size:48px;
   font-weight:900;
 
-  margin-bottom:40px;
-
-  padding:14px 34px;
-
-  border-radius:999px;
-
-  background:
-    rgba(255,255,255,0.05);
-
-  animation:fadeUp 1.4s ease;
+  text-align:center;
 }
 
 .welcome{
 
+  margin-top:24px;
+
+  font-size:32px;
+  line-height:1.7;
+
   text-align:center;
-
-  line-height:1.8;
-
-  font-size:34px;
-
-  animation:fadeUp 1.6s ease;
 }
 
-.greenGlow{
-
-  position:absolute;
-
-  bottom:120px;
-
-  width:220px;
-  height:20px;
-
-  border-radius:999px;
-
-  background:#00ff66;
-
-  filter:blur(18px);
-
-  opacity:0.8;
-}
-
-@keyframes pulse{
-
-  0%{
-    transform:scale(1);
-  }
-
-  50%{
-    transform:scale(1.04);
-  }
-
-  100%{
-    transform:scale(1);
-  }
-}
-
-@keyframes fadeUp{
+@keyframes fadeIn{
 
   from{
     opacity:0;
-    transform:translateY(24px);
+    transform:translateY(20px);
   }
 
   to{
@@ -227,47 +188,29 @@ button:hover{
 
 <div class="container">
 
-  <div class="logo">
-    BEAST TOKYO
+  <div id="mainView">
+
+    <div class="logo">
+      BEAST TOKYO
+    </div>
+
+    <div class="subLogo">
+      CHECK-IN SYSTEM
+    </div>
+
+    <button onclick="checkIn()">
+      CHECK-IN
+    </button>
+
+    <p id="status">
+      LOADING...
+    </p>
+
   </div>
 
-  <div class="sub">
-    CHECK-IN SYSTEM
+  <div id="successView" style="display:none;">
+
   </div>
-
-  <button onclick="checkIn()">
-    CHECK-IN
-  </button>
-
-  <div id="status">
-    READY
-  </div>
-
-</div>
-
-<div id="success">
-
-  <img
-    id="profileImage"
-    class="profileImage"
-  >
-
-  <div class="access">
-    ACCESS GRANTED
-  </div>
-
-  <div
-    id="welcomeName"
-    class="name"
-  >
-  </div>
-
-  <div class="welcome">
-    BEAST TOKYOへ<br>
-    ようこそ！
-  </div>
-
-  <div class="greenGlow"></div>
 
 </div>
 
@@ -287,7 +230,7 @@ async function main(){
   try{
 
     status.innerText =
-      "CONNECTING...";
+      "LIFF INIT...";
 
     await liff.init({
       liffId: LIFF_ID
@@ -296,7 +239,7 @@ async function main(){
     if(!liff.isLoggedIn()){
 
       status.innerText =
-        "LINE LOGIN";
+        "LOGIN...";
 
       liff.login();
 
@@ -321,64 +264,78 @@ async function checkIn(){
     document.getElementById("status");
 
   status.innerText =
-    "AUTHENTICATING...";
+    "CHECKING IN...";
 
   try{
 
     const profile =
       await liff.getProfile();
 
-    await fetch(
-      GAS_URL,
-      {
-        method:"POST",
+    await fetch(GAS_URL,{
 
-        body:JSON.stringify({
+      method:"POST",
 
-          userId:
-            profile.userId,
+      headers:{
+        "Content-Type":"application/json"
+      },
 
-          displayName:
-            profile.displayName,
+      body:JSON.stringify({
 
-          checkInDate:
-            new Date().toISOString()
+        userId:profile.userId,
+        displayName:profile.displayName,
+        pictureUrl:profile.pictureUrl,
+        checkInDate:new Date().toISOString()
 
-        })
-      }
-    );
+      })
+    });
 
-    document
-      .getElementById("profileImage")
-      .src =
-        profile.pictureUrl;
-
-    document
-      .getElementById("welcomeName")
-      .innerHTML =
-        profile.displayName + "様";
-
-    document
-      .getElementById("success")
-      .style.display =
-        "flex";
-
-    status.innerText =
-      "CHECK-IN COMPLETE";
-
-    setTimeout(()=>{
-
-      liff.closeWindow();
-
-    },3000);
+    showSuccess(profile);
 
   }catch(e){
 
     status.innerText =
       "ERROR";
 
+    alert(e.message);
+
     console.error(e);
   }
+}
+
+function showSuccess(profile){
+
+  document.getElementById("mainView")
+    .style.display = "none";
+
+  const successView =
+    document.getElementById("successView");
+
+  successView.style.display = "block";
+
+  successView.innerHTML = `
+
+    <div class="successBox">
+
+      <img
+        class="profileImage"
+        src="${profile.pictureUrl}"
+      >
+
+      <div class="successText">
+        ACCESS GRANTED
+      </div>
+
+      <div class="userName">
+        ${profile.displayName}様
+      </div>
+
+      <div class="welcome">
+        BEAST TOKYOへ<br>
+        ようこそ！
+      </div>
+
+    </div>
+  `;
 }
 
 main();
