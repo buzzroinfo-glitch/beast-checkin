@@ -133,7 +133,40 @@ async function checkIn(){
   }
 }
 
-main();
+async function main(){
+
+  const status =
+    document.getElementById("status");
+
+  try{
+
+    status.innerText = "LIFF INIT...";
+
+    await liff.init({
+      liffId: "2010098806-OYFyyTQp"
+    });
+
+    status.innerText = "LIFF OK";
+
+    if(!liff.isLoggedIn()){
+
+      status.innerText = "LOGIN...";
+
+      liff.login();
+
+      return;
+    }
+
+    status.innerText = "READY";
+
+  }catch(e){
+
+    status.innerText =
+      "ERROR: " + e.message;
+
+    console.error(e);
+  }
+}
 
 </script>
 
