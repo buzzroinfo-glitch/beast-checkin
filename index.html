@@ -211,8 +211,9 @@ async function checkIn(){
       liff.closeWindow();
     },3000);
 
+
   }catch(e){
-    status.innerText = "ERROR";
+    status.innerText = "ERROR: " + e.message;
     console.error(e);
   }
 }
