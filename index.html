@@ -161,65 +161,102 @@ const GAS_URL =
 
 async function main(){
 
-  const status = document.getElementById("status");
+  const status =
+    document.getElementById("status");
 
   try{
 
-    status.innerText = "CONNECTING...";
+    status.innerText =
+      "CONNECTING...";
 
     await liff.init({
       liffId: LIFF_ID
     });
 
     if(!liff.isLoggedIn()){
-      status.innerText = "LOGIN...";
+
+      status.innerText =
+        "LOGIN...";
+
       liff.login();
+
       return;
     }
 
-    status.innerText = "READY";
+    status.innerText =
+      "READY";
 
   }catch(e){
-    status.innerText = "ERROR";
+
+    status.innerText =
+      "ERROR";
+
     console.error(e);
   }
 }
 
 async function checkIn(){
 
-  const status = document.getElementById("status");
+  const status =
+    document.getElementById("status");
 
   try{
 
-    status.innerText = "CHECKING IN...";
+    status.innerText =
+      "CHECKING IN...";
 
-    const profile = await liff.getProfile();
+    const profile =
+      await liff.getProfile();
 
     await fetch(GAS_URL,{
+
       method:"POST",
+
+      mode:"no-cors",
+
+      headers:{
+        "Content-Type":
+          "text/plain;charset=utf-8"
+      },
+
       body:JSON.stringify({
-        userId:profile.userId,
-        displayName:profile.displayName,
-        pictureUrl:profile.pictureUrl,
-        checkInDate:new Date().toISOString()
+
+        userId:
+          profile.userId,
+
+        displayName:
+          profile.displayName,
+
+        pictureUrl:
+          profile.pictureUrl,
+
+        checkInDate:
+          new Date().toISOString()
+
       })
     });
 
     showSuccess(profile);
 
     setTimeout(()=>{
+
       liff.closeWindow();
+
     },3000);
 
   }catch(e){
-    status.innerText = "ERROR";
+
+    status.innerText =
+      "ERROR";
+
     console.error(e);
   }
 }
 
 function showSuccess(profile){
 
-  const app = document.getElementById("app");
+  const app =
+    document.getElementById("app");
 
   app.innerHTML = `
 
