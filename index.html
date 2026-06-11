@@ -51,9 +51,25 @@ body{
 
 #status{
   margin-top:90px;
-  color:#666;
+  color:#aaa;
   font-size:22px;
-  letter-spacing:5px;
+  letter-spacing:3px;
+  line-height:1.8;
+}
+
+.statusMain{
+  color:#00ff88;
+  font-size:30px;
+  font-weight:900;
+  letter-spacing:4px;
+}
+
+.statusSub{
+  margin-top:18px;
+  color:#fff;
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:2px;
   line-height:1.6;
 }
 
@@ -184,8 +200,14 @@ async function main(){
 
   try{
 
-    status.innerText =
-      "CONNECTING...";
+    status.innerHTML =
+      `
+        <div class="statusMain">CONNECTING</div>
+        <div class="statusSub">
+          接続中です<br>
+          そのままお待ちください
+        </div>
+      `;
 
     await liff.init({
       liffId: LIFF_ID
@@ -193,16 +215,28 @@ async function main(){
 
     if(!liff.isLoggedIn()){
 
-      status.innerText =
-        "LOGIN...";
+      status.innerHTML =
+        `
+          <div class="statusMain">LOGIN</div>
+          <div class="statusSub">
+            LINEログイン中です<br>
+            そのままお待ちください
+          </div>
+        `;
 
       liff.login();
 
       return;
     }
 
-    status.innerText =
-      "CHECKING FRIEND STATUS...";
+    status.innerHTML =
+      `
+        <div class="statusMain">CHECKING</div>
+        <div class="statusSub">
+          友だち追加状況を確認中です<br>
+          そのままお待ちください
+        </div>
+      `;
 
     const friendship =
       await liff.getFriendship();
@@ -231,8 +265,14 @@ async function autoCheckIn(){
 
   try{
 
-    status.innerText =
-      "CHECKING IN...";
+    status.innerHTML =
+      `
+        <div class="statusMain">CHECK-IN</div>
+        <div class="statusSub">
+          チェックイン中です<br>
+          この画面のままお待ちください
+        </div>
+      `;
 
     const profile =
       await liff.getProfile();
@@ -334,8 +374,8 @@ function showAddFriend(){
       </div>
 
       <div class="friendText">
-        BEAST MEMBER登録後<br>
-        QR再読み込みで<br>
+        友だち追加後に<br>
+        再度QRを読み込むと<br>
         初回来店ポイントGET
       </div>
 
