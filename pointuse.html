@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>BEAST POINT</title>
+
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+<style>
+
+:root{
+  --neon:#00ff88;
+  --glow:rgba(0,255,136,.75);
+  --dim:#8a8a8a;
+  --red:#ff4d5e;
+  --row:64px;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+html,body{margin:0;padding:0;background:#000;color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Helvetica Neue",Arial,sans-serif}
+
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 110%, rgba(0,255,136,.12), transparent 70%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.02) 0 2px, transparent 2px 18px),
+    #050505;
+}
+
+#app{max-width:480px;margin:0 auto;padding:26px 22px 40px;text-align:center}
+
+.logo{font-size:28px;font-weight:900;letter-spacing:8px;padding-left:8px}
+.sub{margin-top:8px;color:var(--neon);font-size:13px;letter-spacing:6px;padding-left:6px}
+
+.screen{display:none;animation:fadeIn .3s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.status{margin-top:120px;color:var(--dim);font-size:15px;letter-spacing:3px;line-height:1.8}
+.status b{display:block;color:var(--neon);font-size:22px;letter-spacing:5px;margin-bottom:8px}
+
+.banner{margin-top:22px;padding:11px 14px;border:1px solid var(--neon);border-radius:8px;
+  color:var(--neon);font-size:14px;font-weight:700;box-shadow:0 0 18px rgba(0,255,136,.25) inset}
+
+.name{margin-top:22px;font-size:17px;font-weight:700}
+.avail{margin-top:6px;color:var(--dim);font-size:14px}
+.avail b{color:#fff;font-size:18px}
+
+.label{margin-top:26px;color:var(--neon);font-size:12px;letter-spacing:5px}
+
+/* ---------- ドラム ---------- */
+
+.drums{
+  position:relative;
+  margin:14px auto 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  height:calc(var(--row) * 3);
+}
+
+.drums::before{            /* 選択中の行 */
+  content:"";
+  position:absolute;
+  left:0;right:0;
+  top:var(--row);
+  height:var(--row);
+  border-top:2px solid var(--neon);
+  border-bottom:2px solid var(--neon);
+  box-shadow:0 0 22px rgba(0,255,136,.35), 0 0 22px rgba(0,255,136,.25) inset;
+  pointer-events:none;
+}
+
+.drums::after{             /* 上下フェード */
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(#050505 0%, transparent 32%, transparent 68%, #050505 100%);
+  pointer-events:none;
+}
+
+.drum{
+  width:50px;
+  height:100%;
+  overflow-y:scroll;
+  scroll-snap-type:y mandatory;
+  scrollbar-width:none;
+  overscroll-behavior:contain;
+}
+
+.drum::-webkit-scrollbar{display:none}
+
+.drum div{
+  height:var(--row);
+  line-height:var(--row);
+  scroll-snap-align:center;
+  font-size:46px;
+  font-weight:900;
+  color:#fff;
+  font-variant-numeric:tabular-nums;
+}
+
+.drum .pad{scroll-snap-align:none}
+
+.comma{font-size:40px;font-weight:900;color:#555;width:10px}
+.unit{font-size:24px;font-weight:900;color:var(--neon);margin-left:6px}
+
+.quick{margin-top:16px;display:flex;gap:10px;justify-content:center}
+.quick button{flex:1;padding:11px 0;border:1px solid #333;border-radius:8px;background:transparent;
+  color:#bbb;font-size:14px;font-weight:700}
+
+.btn{display:block;width:100%;margin-top:16px;padding:18px;border:none;border-radius:8px;
+  font-size:17px;font-weight:900;letter-spacing:2px;cursor:pointer;text-decoration:none}
+.btn-main{background:var(--neon);color:#000;box-shadow:0 0 28px var(--glow)}
+.btn-main:disabled{background:#1f3a2c;color:#5d7a6b;box-shadow:none}
+.btn-ghost{background:transparent;color:#bbb;border:1px solid #333}
+
+/* ---------- 確認 ---------- */
+
+.confirm-amount{margin-top:70px;font-size:64px;font-weight:900;color:var(--neon);
+  text-shadow:0 0 22px var(--glow)}
+.confirm-amount small{font-size:24px;margin-left:4px}
+.confirm-text{margin-top:10px;font-size:16px;line-height:1.8}
+.error{margin-top:14px;min-height:20px;color:var(--red);font-size:14px;font-weight:700}
+
+/* ---------- 完了 ---------- */
+
+.approved{margin-top:40px;font-size:30px;font-weight:900;letter-spacing:8px;color:var(--neon);
+  text-shadow:0 0 26px var(--glow)}
+.used{margin-top:10px;font-size:72px;font-weight:900;animation:pulse 1.4s ease-in-out infinite}
+.used small{font-size:26px;color:var(--neon);margin-left:4px}
+@keyframes pulse{
+  0%,100%{text-shadow:0 0 18px rgba(0,255,136,.5)}
+  50%{text-shadow:0 0 44px rgba(0,255,136,1),0 0 80px rgba(0,255,136,.6)}
+}
+.clock{margin-top:4px;font-size:16px;color:#fff;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.clock .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);
+  margin-right:8px;animation:blink 1s steps(1) infinite;vertical-align:middle}
+@keyframes blink{50%{opacity:0}}
+.rest{margin-top:22px;font-size:16px}
+.rest b{font-size:20px;color:var(--neon)}
+.show-staff{margin-top:18px;padding:12px;border:1px dashed #444;border-radius:8px;color:#ddd;font-size:14px}
+
+</style>
+</head>
+
+<body>
+<div id="app">
+
+  <div class="logo">BEAST TOKYO</div>
+  <div class="sub">POINT USE</div>
+
+  <!-- 読み込み中 -->
+  <section id="s-loading" class="screen active">
+    <div class="status" id="loadingText"><b>CONNECTING</b>接続中です<br>そのままお待ちください</div>
+  </section>
+
+  <!-- ポイント選択 -->
+  <section id="s-select" class="screen">
+    <div id="checkinBanner" class="banner" style="display:none"></div>
+    <div class="name" id="nameText"></div>
+    <div class="avail">利用可能 <b id="balanceText">0</b> pt</div>
+
+    <div class="label">USE POINT</div>
+    <div class="drums" id="drums"></div>
+
+    <div class="quick">
+      <button id="btnZero">0にする</button>
+      <button id="btnAll">全部使う</button>
+    </div>
+
+    <button class="btn btn-main" id="btnNext" disabled>このポイントを使う</button>
+    <button class="btn btn-ghost" id="btnClose1">閉じる</button>
+  </section>
+
+  <!-- 確認 -->
+  <section id="s-confirm" class="screen">
+    <div class="confirm-amount"><span id="confirmText">0</span><small>pt</small></div>
+    <div class="confirm-text">を使います。よろしいですか？<br>
+      <span style="color:var(--dim);font-size:13px">確定後の取消はSTAFFにお声がけください</span></div>
+    <div class="error" id="confirmError"></div>
+    <button class="btn btn-main" id="btnSubmit">使う</button>
+    <button class="btn btn-ghost" id="btnBack">戻る</button>
+  </section>
+
+  <!-- 完了 -->
+  <section id="s-done" class="screen">
+    <div class="approved">APPROVED</div>
+    <div class="used"><span id="doneUsed">0</span><small>pt</small></div>
+    <div class="clock"><span class="dot"></span><span id="clock"></span></div>
+    <div class="rest">残ポイント <b id="doneBalance">0</b> pt</div>
+    <div class="show-staff">この画面をSTAFFにお見せください</div>
+    <button class="btn btn-ghost" id="btnClose2">閉じる</button>
+  </section>
+
+  <!-- エラー -->
+  <section id="s-error" class="screen">
+    <div class="status"><b style="color:var(--red)">ERROR</b><span id="errorText">STAFFにお声がけください</span></div>
+    <button class="btn btn-ghost" id="btnClose3" style="margin-top:40px">閉じる</button>
+  </section>
+
+</div>
+
+<script>
+
+/*
+ * BEAST POINT 利用ページ（レジ横QR用）
+ * ・開くとGASが本人確認し、当日未チェックインなら自動でチェックイン
+ * ・ドラムで利用ポイントを選ぶ（利用可能ポイントより多くは選べない）
+ * ・お客様の「使う」で確定 → LINEに完了メッセージ
+ */
+
+// ↓ LINE Developersで追加したLIFFのIDに書き換える
+const LIFF_ID =
+"2010098806-pcNJC41X";
+
+const GAS_URL =
+"https://script.google.com/macros/s/AKfycbxBj9nknRvM-xGBKMolLz75yvOFPY0dKZXgvD-vvq9m565Vm326R32y4uv90Dm4V1VT/exec";
+
+const ADD_FRIEND_URL =
+"https://lin.ee/TJRjoQn";
+
+let balance = 0;
+let amount = 0;
+let requestId = "";
+let sending = false;
+let drums = [];
+let digitsCount = 1;
+let clockTimer = null;
+
+const $ = id => document.getElementById(id);
+const fmt = n => Number(n || 0).toLocaleString();
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+  window.scrollTo(0, 0);
+}
+
+function showError(text){
+  $("errorText").textContent = text || "STAFFにお声がけください";
+  show("s-error");
+}
+
+async function callGas(payload){
+  payload.idToken = liff.getIDToken();
+  const res = await fetch(GAS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  });
+  return await res.json();
+}
+
+function newRequestId(){
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
+
+/* ---------- ドラム ---------- */
+
+function rowHeight(){
+  return parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--row"));
+}
+
+function buildDrums(){
+
+  const box = $("drums");
+  box.innerHTML = "";
+  drums = [];
+  digitsCount = String(Math.max(balance, 0)).length;
+
+  for (let i = 0; i < digitsCount; i++){
+
+    // 3桁ごとにカンマ
+    const fromRight = digitsCount - i;
+    if (i > 0 && fromRight % 3 === 0){
+      const c = document.createElement("div");
+      c.className = "comma";
+      c.textContent = ",";
+      box.appendChild(c);
+    }
+
+    const d = document.createElement("div");
+    d.className = "drum";
+    d.innerHTML =
+      '<div class="pad"></div>' +
+      [0,1,2,3,4,5,6,7,8,9].map(n => "<div>" + n + "</div>").join("") +
+      '<div class="pad"></div>';
+
+    let t = null;
+    d.addEventListener("scroll", () => {
+      clearTimeout(t);
+      t = setTimeout(onDrumSettled, 120);
+    }, { passive: true });
+
+    box.appendChild(d);
+    drums.push(d);
+  }
+
+  const u = document.createElement("div");
+  u.className = "unit";
+  u.textContent = "pt";
+  box.appendChild(u);
+}
+
+function readDrums(){
+  const h = rowHeight();
+  return Number(drums.map(d => Math.max(0, Math.min(9, Math.round(d.scrollTop / h)))).join(""));
+}
+
+function setDrums(value, smooth){
+  const h = rowHeight();
+  const s = String(value).padStart(digitsCount, "0");
+  drums.forEach((d, i) => {
+    d.scrollTo({ top: Number(s[i]) * h, behavior: smooth ? "smooth" : "auto" });
+  });
+}
+
+function onDrumSettled(){
+
+  let v = readDrums();
+
+  // 利用可能ポイントより多くは選べない
+  if (v > balance){
+    v = balance;
+    setDrums(v, true);
+  }
+
+  amount = v;
+  $("btnNext").disabled = !(amount > 0);
+  $("btnNext").textContent = amount > 0 ? fmt(amount) + "pt を使う" : "このポイントを使う";
+}
+
+$("btnZero").onclick = () => { setDrums(0, true); };
+$("btnAll").onclick = () => { setDrums(balance, true); };
+
+/* ---------- 起動 ---------- */
+
+async function main(){
+
+  try{
+
+    await liff.init({ liffId: LIFF_ID });
+
+    if (!liff.isLoggedIn()){
+      liff.login();
+      return;
+    }
+
+    const friendship = await liff.getFriendship();
+
+    if (!friendship.friendFlag){
+      $("app").innerHTML =
+        '<div class="logo">BEAST TOKYO</div><div class="sub">POINT USE</div>' +
+        '<div class="status"><b>WELCOME</b>ポイントのご利用には<br>友だち追加が必要です</div>' +
+        '<a class="btn btn-main" href="' + ADD_FRIEND_URL + '">友だち追加</a>';
+      return;
+    }
+
+    $("loadingText").innerHTML = "<b>CHECKING</b>ポイントを確認中です<br>そのままお待ちください";
+
+    const data = await callGas({ mode: "pointuse_init" });
+
+    if (!data.ok){
+      showError(data.message);
+      return;
+    }
+
+    balance = Math.max(0, Number(data.balance || 0));
+
+    if (data.checkedInNow){
+      $("checkinBanner").style.display = "block";
+      $("checkinBanner").textContent =
+        "✓ CHECK-IN 完了（来店ポイント +" + fmt(data.visitPoint) + "pt）";
+    }
+
+    $("nameText").textContent = (data.rankEmoji || "") + " " + (data.name || "") + " 様";
+    $("balanceText").textContent = fmt(balance);
+
+    if (balance <= 0){
+      $("drums").innerHTML = '<div style="color:var(--dim);font-size:15px">ご利用いただけるポイントがありません</div>';
+      $("btnZero").parentElement.style.display = "none";
+      show("s-select");
+      return;
+    }
+
+    buildDrums();
+    show("s-select");
+    setDrums(0, false);
+
+  }catch(e){
+    console.error(e);
+    showError("通信エラーです。もう一度QRを読み込んでください。");
+  }
+}
+
+/* ---------- 確認・確定 ---------- */
+
+$("btnNext").onclick = () => {
+  if (!(amount > 0 && amount <= balance)) return;
+  requestId = newRequestId();
+  $("confirmText").textContent = fmt(amount);
+  $("confirmError").textContent = "";
+  show("s-confirm");
+};
+
+$("btnBack").onclick = () => show("s-select");
+
+$("btnSubmit").onclick = async () => {
+
+  if (sending) return;
+  sending = true;
+  $("btnSubmit").disabled = true;
+  $("confirmError").textContent = "処理中…";
+
+  try{
+
+    const data = await callGas({
+      mode: "pointuse_request",
+      amount: amount,
+      requestId: requestId
+    });
+
+    if (data.ok){
+      $("doneUsed").textContent = fmt(data.used);
+      $("doneBalance").textContent = fmt(data.balance);
+      startClock();
+      show("s-done");
+      return;
+    }
+
+    $("confirmError").textContent = "";
+    showError(data.message);
+
+  }catch(e){
+    console.error(e);
+    // 同じ申請IDで再送できる（二重記録はされない）
+    $("confirmError").textContent = "通信エラーです。もう一度「使う」を押してください。";
+  }finally{
+    sending = false;
+    $("btnSubmit").disabled = false;
+  }
+};
+
+/* 完了画面の時計：秒が動くのでスクショとの見分けがつく */
+function startClock(){
+  clearInterval(clockTimer);
+  const p = n => String(n).padStart(2, "0");
+  const tick = () => {
+    const d = new Date();
+    $("clock").textContent =
+      (d.getMonth() + 1) + "/" + d.getDate() + " " +
+      p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+  };
+  tick();
+  clockTimer = setInterval(tick, 1000);
+}
+
+["btnClose1","btnClose2","btnClose3"].forEach(id => $(id).onclick = () => liff.closeWindow());
+
+main();
+
+</script>
+</body>
+</html>
